@@ -61,8 +61,9 @@ class UserRegistrationForWoocommerceCore {
             if($userStatus == null) return; //user not found
 
             require_once plugin_dir_path(__FILE__) . "Statuses.php";
-            if($userStatus[0]->verification_status != Status::PENDING) return $redirect;
+            if($userStatus[0]->verification_status != Status::PENDING) return $redirect; //status not pending
                
+            //block user from logging in
             return $this->userManager->logout_and_redirect($redirect, array(
                 ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail.', 
                 'type' => 'error']
