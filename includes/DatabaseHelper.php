@@ -93,7 +93,7 @@ class UserRegistrationForWoocommerceDatabaseHelper {
      */
     private function createVerificationCodeTable() {
         $params = "
-            code VARCHAR(64) PRIMARY KEY,
+            code VARCHAR(80) PRIMARY KEY,
             user_id BIGINT(20),
             created DATETIME DEFAULT CURRENT_TIMESTAMP,
             expires DATETIME,

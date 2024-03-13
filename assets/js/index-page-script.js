@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
      */
     $('#user_registration_for_woocommerce_verification_link_prefix').on('input', function() {
         console.log("updatin prefix");
-        updateVerificationLinkPrefix();
+        updateVerificationLinkPrefix(); //TODO: max length: 16 chars <-- VERCHAR(80) - 64
     });
 
 
