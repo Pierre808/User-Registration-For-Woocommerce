@@ -90,11 +90,12 @@ class UserRegistrationForWoocommerceDatabaseHelper {
     /**
      * Adds an user to the database
      * 
-     * @param   $user_id    ID of the user that should be added
-     * @param   $status     Verification status
+     * @param   $user_id            ID of the user that should be added
+     * @param   $status             Verification status
      * 
-     * @return  string|int  string for error message
-     *                      int as ID of the last inserted element
+     * @return  string|int|false    string for error message
+     *                              false on error
+     *                              int as ID of the last inserted element
      */
     public function addUser($user_id, $status) {
         //checks wether a user with the same ID already exists in the database
