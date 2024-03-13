@@ -73,6 +73,7 @@ function user_registration_for_woocommerce_custom_registration_redirect($redirec
         WC()->session->set_customer_session_cookie(true);
     
     }
+    do_action( 'woocommerce_set_cart_cookies',  true );
 
     // Add a notice for the user
     //wc_add_notice('Thank you for your registration. Your account has to be activated before you can login. Please check your email.', 'notice');
@@ -81,6 +82,33 @@ function user_registration_for_woocommerce_custom_registration_redirect($redirec
     
     // Redirect to the account page
     return wc_get_page_permalink('myaccount');
+}
+
+// add notice after user registration redirect
+function user_registration_for_woocommerce_custom_login($redirect) {
+    wp_logout();
+    
+    // Only create when there is none, e.g may clear the existing cart item
+    if ( ! WC()->session->has_session() ) {
+        WC()->session->set_customer_session_cookie(true);
+    
+    }
+    do_action( 'woocommerce_set_cart_cookies',  true );
+
+    wc_add_notice('Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail', 'error');
+
+    /*
+    // Check if the user is accessing the account page and if they are logged in
+    if (is_account_page() && is_user_logged_in()) {
+        // Force log out the user
+        wp_logout();
+        
+        // Redirect the user to the homepage or any other page as per your requirement
+        $redirect = home_url();
+    }
+    */
+
+    return $redirect;
 }
 
 // admin menu pages
@@ -106,10 +134,14 @@ add_action('init', 'user_registration_for_woocommerce_init');
 add_action('admin_enqueue_scripts', 'user_registration_for_woocommerce_enqueue_custom_styles_and_scripts');
 add_action('admin_enqueue_scripts', 'user_registration_for_woocommerce_enqueue_jquery');
 
-//add_action('user_register', 'user_registration_for_woocommerce_user_register_hook', 10, 1);
+//created customer hook
 add_action('woocommerce_created_customer', 'user_registration_for_woocommerce_user_register_hook', 10, 1);
-//add not after registration redirect
+
+//registration redirect hook (before redirect)
 add_action('woocommerce_registration_redirect', 'user_registration_for_woocommerce_custom_registration_redirect');
+//login redirect hook (before redirect)
+add_action('woocommerce_login_redirect', 'user_registration_for_woocommerce_custom_login');
+//add_filter('authenticate', 'user_registration_for_woocommerce_custom_login', 10, 3);
 
 //add to admin menu
 add_action('admin_menu', 'user_registration_for_woocommerce_admin_menu');
