@@ -16,6 +16,7 @@ class UserRegistrationForWoocommerceDatabaseHelper {
      */
     public function init() {
         $this->createUserTable();
+        $this->createVerificationCodeTable();
     }
 
 
@@ -79,12 +80,27 @@ class UserRegistrationForWoocommerceDatabaseHelper {
      * creates the table for users
      */
     private function createUserTable() {
-        $params = "ID BIGINT(20),
+        $params = "
+            ID BIGINT(20),
             verification_status INT(1),
-            PRIMARY KEY (ID)";
+            PRIMARY KEY (ID)
+        ";
         $this->createTable($this->prefix.'user', $params);
     }
 
+    /**
+     * Creates the table for verification codes
+     */
+    private function createVerificationCodeTable() {
+        $params = "
+            code VARCHAR(64) PRIMARY KEY,
+            user_id BIGINT(20),
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            expires DATETIME,
+            FOREIGN KEY (user_id) REFERENCES {$this->prefix}user(ID)
+        ";
+        $this->createTable($this->prefix.'verification_code', $params);
+    }
 
 
     /**
@@ -136,5 +152,52 @@ class UserRegistrationForWoocommerceDatabaseHelper {
             OBJECT
         );
         return $user;
+    }
+
+
+    /**
+     * Adds a verification code to the database
+     * 
+     * @param   $verification_code  code
+     * @param   $user_id            ID of the user that the code belongs to
+     * @param   $created            creation date (optional)
+     * @param   $expires            datetime for the code to expire
+     * 
+     * @return  string|int|false    string for error message
+     *                              false on error
+     *                              int as ID of the last inserted element
+     */
+    public function addVerificationCode($verification_code, $user_id, $expires, $created = '') {
+        //checks wether an identical code already exists in the database
+        $code = $this->wpdb->get_row(
+            $this->wpdb->prepare(
+                "SELECT code FROM {$this->prefix}verification_code WHERE code = %s",
+                $verification_code
+            )
+        );
+        
+        if($code) {
+            return 'Code is already stored in the database!';
+        }
+
+
+        $insertArr = array(
+            'code' => $verification_code,
+            'user_id' => $user_id,
+            'expires' => $expires
+        );
+
+        if($created != '') {
+            $insertArr['created'] = $created;
+        }
+
+        $this->wpdb->insert(
+            $this->prefix . 'verification_code',
+            $insertArr
+        );
+
+        $insertId = $this->wpdb->insert_id;
+        
+        return $insertId;
     }
 }

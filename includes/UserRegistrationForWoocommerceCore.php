@@ -3,11 +3,13 @@
 require_once plugin_dir_path(__FILE__) . "DatabaseHelper.php";
 require_once plugin_dir_path(__FILE__) . "MailManager.php";
 require_once plugin_dir_path(__FILE__) . "UserManager.php";
+require_once plugin_dir_path(__FILE__) . "VerificationCodeManager.php";
 
 class UserRegistrationForWoocommerceCore {
     private $databaseHelper;
     private $mailManager;
     private $userManager;
+    private $verificationCodeManager;
 
     /**
      * constructor
@@ -17,6 +19,7 @@ class UserRegistrationForWoocommerceCore {
         $this->databaseHelper = new UserRegistrationForWoocommerceDatabaseHelper();
         $this->mailManager = new UserRegistrationForWoocommerceMailManager();
         $this->userManager = new UserRegistrationForWoocommerceUserManager();
+        $this->verificationCodeManager = new UserRegistrationForWoocommerceVerificationCodeManager();
 
         //hooks
         require_once plugin_dir_path(__FILE__) . "HooksManager.php";
@@ -42,11 +45,27 @@ class UserRegistrationForWoocommerceCore {
     /**
      * Add notice after user registration redirect
      */
-    public function user_registration_for_woocommerce_custom_registration_redirect($redirect_to) {
-        return $this->userManager->logout_and_redirect($redirect_to, array(
-            ['notice' =>'Vielen Dank für Ihre Registrierung. Ihr Konto muss aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen Sie Ihre E-Mail.', 
-            'type' => 'notice']
-        ));
+    public function user_registration_for_woocommerce_custom_registration_redirect($redirect_to){
+        $user = wp_get_current_user();
+        if( isset($user) && is_a( $user, 'WP_User' ) && $user->ID > 0 ) {
+            //block user from logging in
+            $verificationCode = $this->verificationCodeManager->generateCode();
+            $verificationCodeExpires = $this->verificationCodeManager->getCodeExpiration();
+            
+            $verificationCodeResult = $this->databaseHelper->addVerificationCode($verificationCode, $user->ID, $verificationCodeExpires);
+
+
+            if(null != $verificationCodeResult && !is_int($verificationCodeResult)) {
+                //error
+            }
+
+            return $this->userManager->logout_and_redirect($redirect_to, array(
+                ['notice' =>'Vielen Dank für Ihre Registrierung. Ihr Konto muss aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen Sie Ihre E-Mail.', 
+                'type' => 'notice']
+            ));
+        } 
+        
+        return $redirect;
     }
 
     /**

@@ -17,6 +17,9 @@ ob_start();
     wp_editor(stripslashes($content), $editor_id, $settings);
 ?>
 
+<p>Verification-link prefix:</p>
+<input type="text" id="user_registration_for_woocommerce_verification_link_prefix"/>
+
 <?php
 $content = ob_get_clean();
 
