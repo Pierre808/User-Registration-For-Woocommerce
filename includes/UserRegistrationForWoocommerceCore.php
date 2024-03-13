@@ -43,28 +43,22 @@ class UserRegistrationForWoocommerceCore {
      * Add notice after user registration redirect
      */
     public function user_registration_for_woocommerce_custom_registration_redirect($redirect_to) {
-        wp_logout();
-        
-        // Only create when there is none, e.g may clear the existing cart item
-        if ( ! WC()->session->has_session() ) {
-            WC()->session->set_customer_session_cookie(true);
-        
-        }
-        do_action( 'woocommerce_set_cart_cookies',  true );
-
-        // Add a notice for the user
-        //wc_add_notice('Thank you for your registration. Your account has to be activated before you can login. Please check your email.', 'notice');
-        wc_add_notice('Vielen Dank für Ihre Registrierung. Ihr Konto muss aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen Sie Ihre E-Mail.', 'notice');
-
-        
-        // Redirect to the account page
-        return wc_get_page_permalink('myaccount');
+        return $this->userManager->logout_and_redirect($redirect, array(
+            ['text' =>'Vielen Dank für Ihre Registrierung. Ihr Konto muss aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen Sie Ihre E-Mail.', 
+            'type' => 'notice']
+        ));
     }
 
     /**
-     * Add notice after user registration redirect
+     * Add notice after user login redirect
      */
     public function user_registration_for_woocommerce_custom_login($redirect) {
-        return $this->userManager->logout_and_redirect($redirect);
+        //TODO: only if user is not verified already
+        //TODO: resend mail link
+
+        return $this->userManager->logout_and_redirect($redirect, array(
+            ['text' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail.', 
+            'type' => 'error']
+        ));
     }
 }

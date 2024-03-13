@@ -54,7 +54,13 @@ class UserRegistrationForWoocommerceUserManager {
         }
     }
 
-    public function logout_and_redirect($redirect) {
+    /**
+     * Logs a user out and redirects him to the next page
+     * 
+     * @param   $redirect  
+     * @param   $notices    array of notices consisting of 'notice' and 'type' key, to be displayed as wc notice
+     */
+    public function logout_and_redirect($redirect, $notices) {
         $this->logout();
         
         // Only create when there is none, e.g may clear the existing cart item
@@ -64,13 +70,14 @@ class UserRegistrationForWoocommerceUserManager {
         }
         do_action( 'woocommerce_set_cart_cookies',  true );
 
-        wc_add_notice('Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail', 'error');
+        for($i = 0; $i < count($notices); $i++) {
+            wc_add_notice($notices[$i]['notice'], $notices[$i]['type']);
+        }
 
         return $redirect;
     }
 
     public function logout() {
-        //TODO: only logout if not verified!
         wp_logout();
     }
 }
