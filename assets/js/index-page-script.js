@@ -1,4 +1,6 @@
 jQuery(document).ready(function($) {
+    console.log(ajaxurl[0]);
+    
     tinyMCE.get('user_registration_for_woocommerce_verification_mail_content').on('change', function() {
         tinyMCE.triggerSave();
 
@@ -10,7 +12,7 @@ jQuery(document).ready(function($) {
         console.log("val: " , tinyMCE.get('user_registration_for_woocommerce_verification_mail_content').getContent());
         return $.ajax({
             type: 'POST',
-            url: ajaxurl, // The wp ajax url
+            url: ajaxurl[0], // The wp ajax url
             data: {
                 action: 'user_registration_for_woocommerce_save_to_options',
                 values : {

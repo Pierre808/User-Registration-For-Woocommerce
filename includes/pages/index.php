@@ -26,4 +26,4 @@ echo $content;
  * Custom scripts
  */
 wp_enqueue_script('user-registration-for-woocommerce-index-page-script', plugin_dir_url(__FILE__) . '../../assets/js/index-page-script.js');
-wp_localize_script('user-registration-for-woocommerce-index-page-script', 'ajaxurl', admin_url('admin-ajax.php'));
+wp_localize_script('user-registration-for-woocommerce-index-page-script', 'ajaxurl', array( admin_url('admin-ajax.php') ));
