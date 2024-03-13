@@ -86,6 +86,7 @@ function user_registration_for_woocommerce_custom_registration_redirect($redirec
 
 // add notice after user registration redirect
 function user_registration_for_woocommerce_custom_login($redirect) {
+    //TODO: only logout if not verified!
     wp_logout();
     
     // Only create when there is none, e.g may clear the existing cart item
