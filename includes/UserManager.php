@@ -36,7 +36,7 @@ class UserRegistrationForWoocommerceUserManager {
         $email = $user_info->user_email;
         $username = $user_info->user_login;
 
-        require_once plugin_dir_path(__FILE__) . "MailManger.php";
+        require_once plugin_dir_path(__FILE__) . "MailManager.php";
         $mailManager = new UserRegistrationForWoocommerceMailManager();
         $mailSendingResult = $mailManager->sendStandardVerificationEmail($email);
     
