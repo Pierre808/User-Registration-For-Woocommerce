@@ -122,4 +122,19 @@ class UserRegistrationForWoocommerceDatabaseHelper {
         
         return $insertId;
     }
+
+     /**
+     * Gets the verification_status from the database for a specific user
+     * 
+     * @param   $user_id            ID of the user
+     * 
+     * @return  object|null   Database query results.
+     */
+    public function getUserStatus($user_id) {
+        $user = $this->wpdb->get_results(
+            "SELECT verification_status FROM {$this->prefix}user WHERE ID = {$user_id}", 
+            OBJECT
+        );
+        return $user;
+    }
 }

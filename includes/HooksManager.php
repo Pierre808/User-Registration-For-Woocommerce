@@ -24,7 +24,7 @@ class UserRegistrationForWoocommerceHooksManager {
         //registration redirect hook (before redirect)
         add_action('woocommerce_registration_redirect', array($this->userRegistrationForWoocommerceCore, 'user_registration_for_woocommerce_custom_registration_redirect'));
         //login redirect hook (before redirect)
-        add_action('woocommerce_login_redirect', array($this->userRegistrationForWoocommerceCore, 'user_registration_for_woocommerce_custom_login'));
+        add_action('woocommerce_login_redirect', array($this->userRegistrationForWoocommerceCore, 'user_registration_for_woocommerce_custom_login'), 10, 2);
 
         //add to admin menu
         add_action('admin_menu', array($this, 'user_registration_for_woocommerce_admin_menu'));

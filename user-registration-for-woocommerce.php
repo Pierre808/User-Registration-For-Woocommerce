@@ -7,6 +7,7 @@ Version: 1.0
 Author: Pierre Equit
 */
 
+//TODO: user delete -> delete in database
 
 /**
  * ---- INIT ----

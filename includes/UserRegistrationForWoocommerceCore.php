@@ -52,13 +52,25 @@ class UserRegistrationForWoocommerceCore {
     /**
      * Add notice after user login redirect
      */
-    public function user_registration_for_woocommerce_custom_login($redirect) {
-        //TODO: only if user is not verified already
+    public function user_registration_for_woocommerce_custom_login($redirect, $user = '') {
         //TODO: resend mail link
 
-        return $this->userManager->logout_and_redirect($redirect, array(
-            ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail.', 
-            'type' => 'error']
-        ));
+        if( isset($user) && is_a( $user, 'WP_User' ) && $user->ID > 0 ) {
+            $userStatus = $this->databaseHelper->getUserStatus($user->ID);
+
+            if($userStatus == null) return; //user not found
+
+            require_once plugin_dir_path(__FILE__) . "Statuses.php";
+            if($userStatus[0]->verification_status != Status::PENDING) return $redirect;
+               
+            return $this->userManager->logout_and_redirect($redirect, array(
+                ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail.', 
+                'type' => 'error']
+            ));
+        } else {
+            // user error
+        }
+
+        
     }
 }
