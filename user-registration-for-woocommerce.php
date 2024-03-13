@@ -86,30 +86,9 @@ function user_registration_for_woocommerce_custom_registration_redirect($redirec
 
 // add notice after user registration redirect
 function user_registration_for_woocommerce_custom_login($redirect) {
-    //TODO: only logout if not verified!
-    wp_logout();
-    
-    // Only create when there is none, e.g may clear the existing cart item
-    if ( ! WC()->session->has_session() ) {
-        WC()->session->set_customer_session_cookie(true);
-    
-    }
-    do_action( 'woocommerce_set_cart_cookies',  true );
-
-    wc_add_notice('Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail', 'error');
-
-    /*
-    // Check if the user is accessing the account page and if they are logged in
-    if (is_account_page() && is_user_logged_in()) {
-        // Force log out the user
-        wp_logout();
-        
-        // Redirect the user to the homepage or any other page as per your requirement
-        $redirect = home_url();
-    }
-    */
-
-    return $redirect;
+    require_once plugin_dir_path(__FILE__) . "includes/UserManager.php";
+    $userManager = new UserRegistrationForWoocommerceUserManager();
+    return $userManager->logout_and_redirect($redirect);
 }
 
 // admin menu pages

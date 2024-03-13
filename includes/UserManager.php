@@ -53,4 +53,24 @@ class UserRegistrationForWoocommerceUserManager {
             }
         }
     }
+
+    public function logout_and_redirect($redirect) {
+        $this->logout();
+        
+        // Only create when there is none, e.g may clear the existing cart item
+        if ( ! WC()->session->has_session() ) {
+            WC()->session->set_customer_session_cookie(true);
+        
+        }
+        do_action( 'woocommerce_set_cart_cookies',  true );
+
+        wc_add_notice('Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail', 'error');
+
+        return $redirect;
+    }
+
+    public function logout() {
+        //TODO: only logout if not verified!
+        wp_logout();
+    }
 }
