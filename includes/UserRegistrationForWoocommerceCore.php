@@ -40,6 +40,35 @@ class UserRegistrationForWoocommerceCore {
      */
     public function user_registration_for_woocommerce_user_register_hook($user_id) {
         $this->userManager->addUser($user_id);
+        
+        //block user from logging in
+        $verificationCode = $this->verificationCodeManager->generateCode();
+        $verificationCodeExpires = $this->verificationCodeManager->getCodeExpiration();
+        
+        $verificationCodeResult = $this->databaseHelper->addVerificationCode($verificationCode, $user_id, $verificationCodeExpires);
+
+        if(null != $verificationCodeResult && !is_int($verificationCodeResult)) {
+            //error
+        }
+
+        $user_info = get_userdata($user_id);
+        $email = $user_info->user_email;
+        $username = $user_info->user_login;
+
+        $mailSendingResult = $this->mailManager->sendStandardVerificationEmail($email, $verificationCode);
+    
+        //mail error handling
+        if($mailSendingResult !== true) {
+            if(is_bool($mailSendingResult) && $mailSendingResult === false) {
+                return "An error occured while sending the mail";
+            }
+            if(is_string($mailSendingResult)) {
+                return $mailSendingResult;
+            }
+            else {
+                return "An unknown error occured while sending the mail";
+            }
+        }
     }
 
     /**
@@ -48,17 +77,6 @@ class UserRegistrationForWoocommerceCore {
     public function user_registration_for_woocommerce_custom_registration_redirect($redirect_to){
         $user = wp_get_current_user();
         if( isset($user) && is_a( $user, 'WP_User' ) && $user->ID > 0 ) {
-            //block user from logging in
-            $verificationCode = $this->verificationCodeManager->generateCode();
-            $verificationCodeExpires = $this->verificationCodeManager->getCodeExpiration();
-            
-            $verificationCodeResult = $this->databaseHelper->addVerificationCode($verificationCode, $user->ID, $verificationCodeExpires);
-
-
-            if(null != $verificationCodeResult && !is_int($verificationCodeResult)) {
-                //error
-            }
-
             return $this->userManager->logout_and_redirect($redirect_to, array(
                 ['notice' =>'Vielen Dank für Ihre Registrierung. Ihr Konto muss aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen Sie Ihre E-Mail.', 
                 'type' => 'notice']

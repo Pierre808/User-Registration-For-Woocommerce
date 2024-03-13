@@ -31,27 +31,6 @@ class UserRegistrationForWoocommerceUserManager {
                 return "An unknown error occured while adding the user to the Database";
             }
         }
-
-        $user_info = get_userdata($user_id);
-        $email = $user_info->user_email;
-        $username = $user_info->user_login;
-
-        require_once plugin_dir_path(__FILE__) . "MailManager.php";
-        $mailManager = new UserRegistrationForWoocommerceMailManager();
-        $mailSendingResult = $mailManager->sendStandardVerificationEmail($email);
-    
-        //mail error handling
-        if($mailSendingResult !== true) {
-            if(is_bool($mailSendingResult) && $mailSendingResult === false) {
-                return "An error occured while sending the mail";
-            }
-            if(is_string($mailSendingResult)) {
-                return $mailSendingResult;
-            }
-            else {
-                return "An unknown error occured while sending the mail";
-            }
-        }
     }
 
     /**

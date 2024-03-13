@@ -29,9 +29,28 @@ class UserRegistrationForWoocommerceMailManager{
      * @return  string|bool string with error text, when email is not valid
      *                      bool whether the email was send successfully, if the validation succeeded
      */
-    public function sendStandardVerificationEmail($email) {
+    public function sendStandardVerificationEmail($email, $verificationCode) {
         $subject = 'Bitte verifizieren Sie Ihre E-Mail-Adresse';
         //$message = 'Please click on the following link to verify your email address: [Verification Link]';
+        
+        $verificationLinkUrl = get_permalink( wc_get_page_id( 'myaccount' ) );
+
+        // Add parameter to URL
+        if (strpos($verificationLinkUrl, '?') !== false) {
+            // URL already has parameters
+            $verificationLinkUrl .= "&user_registration_code=$verificationCode";
+        } else {
+            // URL does not have parameters
+            $verificationLinkUrl .= "?user_registration_code=$verificationCode";
+        }
+        
+        require_once plugin_dir_path(__FILE__) . "PlaceholderFilter.php";
+        $placeholderFilter = new UserRegistrationForWoocommercePlaceholderFilter();
+        $messageContent = $placeholderFilter->verificationlinkPlaceholder(
+            get_option('user_registration_for_woocommerce_verification_mail_content_value'), 
+            $verificationLinkUrl
+        );
+
         $message = '
         <html>
         <head>
@@ -61,7 +80,7 @@ class UserRegistrationForWoocommerceMailManager{
         <body>
             <div class="container">
                 '
-                . get_option('user_registration_for_woocommerce_verification_mail_content_value') . 
+                . $messageContent . 
                 '
             </div>
         </body>
