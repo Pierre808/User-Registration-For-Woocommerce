@@ -68,10 +68,8 @@ class UserRegistrationForWoocommerceCore {
                 ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail.', 
                 'type' => 'error']
             ));
-        } else {
-            // user error
-        }
-
+        } 
         
+        return $redirect;
     }
 }
