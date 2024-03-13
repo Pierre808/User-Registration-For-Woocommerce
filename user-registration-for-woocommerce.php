@@ -62,10 +62,23 @@ function user_registration_for_woocommerce_save_to_options() {
 
 // add notice after user registration redirect
 function user_registration_for_woocommerce_custom_registration_redirect($redirect_to) {
+    //wp_destroy_current_session();
+    //wp_clear_auth_cookie();
+    //wp_set_current_user( 0 );
+
+    wp_logout();
+    
+    // Only create when there is none, e.g may clear the existing cart item
+    if ( ! WC()->session->has_session() ) {
+        WC()->session->set_customer_session_cookie(true);
+    
+    }
+
     // Add a notice for the user
     //wc_add_notice('Thank you for your registration. Your account has to be activated before you can login. Please check your email.', 'notice');
     wc_add_notice('Vielen Dank für Ihre Registrierung. Ihr Konto muss aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen Sie Ihre E-Mail.', 'notice');
 
+    
     // Redirect to the account page
     return wc_get_page_permalink('myaccount');
 }
