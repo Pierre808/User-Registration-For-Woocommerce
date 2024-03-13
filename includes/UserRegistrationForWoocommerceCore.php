@@ -43,8 +43,8 @@ class UserRegistrationForWoocommerceCore {
      * Add notice after user registration redirect
      */
     public function user_registration_for_woocommerce_custom_registration_redirect($redirect_to) {
-        return $this->userManager->logout_and_redirect($redirect, array(
-            ['text' =>'Vielen Dank für Ihre Registrierung. Ihr Konto muss aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen Sie Ihre E-Mail.', 
+        return $this->userManager->logout_and_redirect($redirect_to, array(
+            ['notice' =>'Vielen Dank für Ihre Registrierung. Ihr Konto muss aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen Sie Ihre E-Mail.', 
             'type' => 'notice']
         ));
     }
@@ -57,7 +57,7 @@ class UserRegistrationForWoocommerceCore {
         //TODO: resend mail link
 
         return $this->userManager->logout_and_redirect($redirect, array(
-            ['text' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail.', 
+            ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail.', 
             'type' => 'error']
         ));
     }
