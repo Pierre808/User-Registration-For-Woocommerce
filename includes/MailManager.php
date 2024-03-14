@@ -33,7 +33,7 @@ class UserRegistrationForWoocommerceMailManager{
         $subject = 'Bitte verifizieren Sie Ihre E-Mail-Adresse';
         //$message = 'Please click on the following link to verify your email address: [Verification Link]';
         
-        $verificationLinkUrl = get_permalink( wc_get_page_id( 'myaccount' ) );
+        $verificationLinkUrl = home_url() . "/wp-json/user-registration/v1/verification-link";
 
         // Add parameter to URL
         if (strpos($verificationLinkUrl, '?') !== false) {

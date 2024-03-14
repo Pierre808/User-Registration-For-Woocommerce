@@ -25,14 +25,24 @@ class UserRegistrationForWoocommerceHooksManager {
         add_action('woocommerce_registration_redirect', array($this->userRegistrationForWoocommerceCore, 'user_registration_for_woocommerce_custom_registration_redirect'), 10, 1);
         //login redirect hook (before redirect)
         add_action('woocommerce_login_redirect', array($this->userRegistrationForWoocommerceCore, 'user_registration_for_woocommerce_custom_login'), 10, 2);
+        
+        //custom endpoint
+        add_action('rest_api_init', array($this, 'user_registration_for_woocommerce_verification_endpoint'));
 
         //add to admin menu
         add_action('admin_menu', array($this, 'user_registration_for_woocommerce_admin_menu'));
-
         
         //save to options
         add_action('wp_ajax_user_registration_for_woocommerce_save_to_options', array($this, 'user_registration_for_woocommerce_save_to_options')); // For logged-in users
         add_action('wp_ajax_nopriv_user_registration_for_woocommerce_save_to_options', array($this, 'user_registration_for_woocommerce_save_to_options')); // For non-logged-in users
+    }
+
+
+    public function user_registration_for_woocommerce_verification_endpoint() {
+        register_rest_route('user-registration/v1', '/verification-link', array(
+            'methods' => 'GET',
+            'callback' => array($this->userRegistrationForWoocommerceCore, 'user_registration_for_woocommerce_handle_verification_request'),
+        ));
     }
 
 

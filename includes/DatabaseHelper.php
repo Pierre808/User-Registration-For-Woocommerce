@@ -139,7 +139,22 @@ class UserRegistrationForWoocommerceDatabaseHelper {
         return $insertId;
     }
 
-     /**
+    /**
+     * 
+     */
+    public function getUser($user_id) {
+        $user = $this->wpdb->get_row(
+            $this->wpdb->prepare(
+                "SELECT ID, verification_status FROM {$this->prefix}user WHERE ID = %d",
+                $user_id 
+            ),
+            OBJECT
+        );
+
+        return $user;
+    }
+
+    /**
      * Gets the verification_status from the database for a specific user
      * 
      * @param   $user_id            ID of the user
@@ -152,6 +167,41 @@ class UserRegistrationForWoocommerceDatabaseHelper {
             OBJECT
         );
         return $user;
+    }
+
+    /**
+     * Sets a users verification status
+     * 
+     * @return  int|false   The number of rows updated, or false on error.
+     */
+    public function setUserStatus($user_id, $verification_status) {
+        //checks wether user with the ID is in the database
+        $user = $this->wpdb->get_row(
+            "SELECT ID FROM {$this->prefix}user WHERE ID = " . $user_id
+        );
+        
+        if($user) {
+            $r = $this->wpdb->update(
+                $this->prefix.'user',
+                array(
+                    'verification_status' => $status
+                ),
+                array(
+                    'ID' => $user_id
+                )
+            );
+        }
+        else {
+            $r = $this->wpdb->insert(
+                $this->prefix.'user',
+                array(
+                    'ID' => $user_id,
+                    'verification_status' => $verification_status
+                )
+            );
+        }
+
+        return $r;
     }
 
 
@@ -199,5 +249,29 @@ class UserRegistrationForWoocommerceDatabaseHelper {
         $insertId = $this->wpdb->insert_id;
         
         return $insertId;
+    }
+
+    /**
+     * Gets the entire verification_code entity from the database where code matches
+     * 
+     * @param   $verification_code  Code to search for in the table
+     * 
+     * @return  object|null         Database query results.
+     */
+    public function getVerificationCode($verification_code) {
+        $verification_code = sanitize_text_field($verification_code);
+
+        $code = $this->wpdb->get_row(
+            $this->wpdb->prepare(
+                "SELECT code, user_id, created, expires FROM {$this->prefix}verification_code WHERE code = '{$verification_code}'", 
+            ),
+            OBJECT
+        );
+
+
+        update_option('urfw-gvc', $code);
+        //TODO: ERROR (returns string????)
+
+        return $code;
     }
 }

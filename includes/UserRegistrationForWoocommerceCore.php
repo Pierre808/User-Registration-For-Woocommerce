@@ -109,4 +109,77 @@ class UserRegistrationForWoocommerceCore {
         
         return $redirect;
     }
+
+    /**
+     * Hanlde verification GET request
+     * 
+     * @param   $data   GET data (should consist of 'user_registration_code')
+     */
+    public function user_registration_for_woocommerce_handle_verification_request($data) {
+        $redirect = get_permalink( wc_get_page_id( 'myaccount' ) );
+
+        if(!$data->get_params() || !array_key_exists('user_registration_code', $data->get_params()))
+        {
+            $redirect = $this->userManager->logout_and_redirect($redirect, array(
+                ['notice' =>'registration code missing!.', 
+                'type' => 'error']
+            ));
+
+            update_option('urfw-redirect', 1);
+
+            wp_redirect($redirect);
+
+            exit();
+        }
+
+        $verificationCode = $data['user_registration_code'];
+
+        $verificationCodeDb = $this->databaseHelper->getVerificationCode($verificationCode);
+        if($verificationCodeDb == null) {
+            $redirect = $this->userManager->logout_and_redirect($redirect, array(
+                ['notice' =>'invalid registration code!.', 
+                'type' => 'error']
+            ));
+
+            wp_redirect($redirect);
+
+            exit();
+        }
+
+        $verificationCodeExpires =  date( 'Y-m-d H:i:s', strtotime( $verificationCodeDb->expires ) ); 
+        $currentDateTime =  date( 'Y-m-d H:i:s', strtotime( current_time('Y-m-d H:i:s') ) );
+        if($verificationCodeExpires < $currentDateTime) {
+            $redirect = $this->userManager->logout_and_redirect($redirect, array(
+                ['notice' =>'registration code expired!.', 
+                'type' => 'error']
+            ));
+
+            wp_redirect($redirect);
+
+            exit();
+        }
+
+        $user = $this->databaseHelper->getUser($verificationCodeDb->user_id);
+        if($user == null) {
+            $redirect = $this->userManager->logout_and_redirect($redirect, array(
+                ['notice' =>'invalid user!.', 
+                'type' => 'error']
+            ));
+            
+            wp_redirect($redirect);
+
+            exit();
+        }
+
+        require_once plugin_dir_path(__FILE__) . "Statuses.php";
+        $this->databaseHelper->setUserStatus($user->ID, Status::APPROVED);
+
+        $redirect = $this->userManager->logout_and_redirect($redirect, array(
+            ['notice' =>'Erfolgreich verifiziert. Sie können Sich nun anmelden.', 
+            'type' => 'notice']
+        ));
+        
+        wp_redirect($redirect);
+        exit();
+    }
 }
