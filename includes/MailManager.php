@@ -1,6 +1,12 @@
 <?php
 
 class UserRegistrationForWoocommerceMailManager{
+    private $core;
+
+    public function __construct($pCore) {
+        $this->core = $pCore;
+    }
+    
     /**
      * Sends an email
      * 
@@ -18,7 +24,7 @@ class UserRegistrationForWoocommerceMailManager{
             return "Invalid email!";
         }
 
-        wp_mail($email, $subject, $message);
+        return wp_mail($email, $subject, $message);
     }
 
     /**
@@ -29,7 +35,23 @@ class UserRegistrationForWoocommerceMailManager{
      * @return  string|bool string with error text, when email is not valid
      *                      bool whether the email was send successfully, if the validation succeeded
      */
-    public function sendStandardVerificationEmail($email, $verificationCode) {
+    public function sendStandardVerificationEmail($user_id = '', $verificationCode = '') {
+        $user_info = '';
+        if($user_id == '') {
+            $user_info = wp_get_current_user();
+        }
+        else {
+            $user_info = get_userdata($user_id);
+        }
+        $email = $user_info->user_email;
+
+        if($verificationCode == '') {
+            $verificationCode = $this->core->verificationCodeManager->generateCode();
+            $verificationCodeExpires = $this->core->verificationCodeManager->getCodeExpiration();
+            
+            $verificationCodeResult = $this->core->databaseHelper->addVerificationCode($verificationCode, $user_id, $verificationCodeExpires);
+        }
+
         $subject = 'Bitte verifizieren Sie Ihre E-Mail-Adresse';
         //$message = 'Please click on the following link to verify your email address: [Verification Link]';
         
@@ -89,10 +111,12 @@ class UserRegistrationForWoocommerceMailManager{
 
         add_filter('wp_mail_content_type', array($this, 'set_html_content_type'));
 
-        $this->sendEmail($email, $subject, $message);
+        $r = $this->sendEmail($email, $subject, $message);
 
         // Reset content type to default
         remove_filter('wp_mail_content_type', array($this, 'set_html_content_type'));
+
+        return $r;
     }
 
     public function set_html_content_type() {

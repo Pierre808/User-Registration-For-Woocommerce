@@ -38,6 +38,9 @@ class UserRegistrationForWoocommerceHooksManager {
         //save to options
         add_action('wp_ajax_user_registration_for_woocommerce_save_to_options', array($this, 'user_registration_for_woocommerce_save_to_options')); // For logged-in users
         add_action('wp_ajax_nopriv_user_registration_for_woocommerce_save_to_options', array($this, 'user_registration_for_woocommerce_save_to_options')); // For non-logged-in users
+
+        add_action('wp_ajax_user_registration_for_woocommerce_resend_verification_email', array($this, 'wp_ajax_user_registration_for_woocommerce_resend_verification_email')); // For logged-in users
+        add_action('wp_ajax_nopriv_user_registration_for_woocommerce_resend_verification_email', array($this, 'wp_ajax_user_registration_for_woocommerce_resend_verification_email')); // For non-logged-in users
     }
 
 
@@ -90,6 +93,7 @@ class UserRegistrationForWoocommerceHooksManager {
     public function user_registration_for_woocommerce_enqueue_footer_script() {
         if(is_account_page()) {
             wp_enqueue_script('user_registration_for_woocommerce_verificationmail_script',  plugin_dir_url(__FILE__) . '../assets/js/verificationmail-script.js');
+            wp_localize_script('user_registration_for_woocommerce_verificationmail_script', 'ajaxurl', array( admin_url('admin-ajax.php') ));
         }
     }
 
@@ -98,5 +102,9 @@ class UserRegistrationForWoocommerceHooksManager {
      */
     public function user_registration_for_woocommerce_save_to_options() {
         include(plugin_dir_path(__FILE__) . 'ajax/save_to_options.php');
+    }
+
+    public function wp_ajax_user_registration_for_woocommerce_resend_verification_email() {
+        include(plugin_dir_path(__FILE__) . 'ajax/resend_verification_email.php');
     }
 }

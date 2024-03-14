@@ -6,10 +6,10 @@ require_once plugin_dir_path(__FILE__) . "UserManager.php";
 require_once plugin_dir_path(__FILE__) . "VerificationCodeManager.php";
 
 class UserRegistrationForWoocommerceCore {
-    private $databaseHelper;
-    private $mailManager;
-    private $userManager;
-    private $verificationCodeManager;
+    public $databaseHelper;
+    public $mailManager;
+    public $userManager;
+    public $verificationCodeManager;
 
     /**
      * constructor
@@ -17,7 +17,7 @@ class UserRegistrationForWoocommerceCore {
     public function __construct() {
 
         $this->databaseHelper = new UserRegistrationForWoocommerceDatabaseHelper();
-        $this->mailManager = new UserRegistrationForWoocommerceMailManager();
+        $this->mailManager = new UserRegistrationForWoocommerceMailManager($this);
         $this->userManager = new UserRegistrationForWoocommerceUserManager();
         $this->verificationCodeManager = new UserRegistrationForWoocommerceVerificationCodeManager();
 
@@ -40,22 +40,8 @@ class UserRegistrationForWoocommerceCore {
      */
     public function user_registration_for_woocommerce_user_register_hook($user_id) {
         $this->userManager->addUser($user_id);
-        
-        //block user from logging in
-        $verificationCode = $this->verificationCodeManager->generateCode();
-        $verificationCodeExpires = $this->verificationCodeManager->getCodeExpiration();
-        
-        $verificationCodeResult = $this->databaseHelper->addVerificationCode($verificationCode, $user_id, $verificationCodeExpires);
 
-        if(null != $verificationCodeResult && !is_int($verificationCodeResult)) {
-            //error
-        }
-
-        $user_info = get_userdata($user_id);
-        $email = $user_info->user_email;
-        $username = $user_info->user_login;
-
-        $mailSendingResult = $this->mailManager->sendStandardVerificationEmail($email, $verificationCode);
+        $mailSendingResult = $this->mailManager->sendStandardVerificationEmail($user_id);
     
         //mail error handling
         if($mailSendingResult !== true) {
@@ -90,8 +76,6 @@ class UserRegistrationForWoocommerceCore {
      * Add notice after user login redirect
      */
     public function user_registration_for_woocommerce_custom_login($redirect, $user = '') {
-        //TODO: resend mail link
-
         if( isset($user) && is_a( $user, 'WP_User' ) && $user->ID > 0 ) {
             $userStatus = $this->databaseHelper->getUserStatus($user->ID);
 
@@ -101,18 +85,8 @@ class UserRegistrationForWoocommerceCore {
             if($userStatus[0]->verification_status != Status::PENDING) return $redirect; //status not pending
                
             //block user from logging in
-            $verificationCode = $this->verificationCodeManager->generateCode();
-            $verificationCodeExpires = $this->verificationCodeManager->getCodeExpiration();
-            
-            $verificationCodeResult = $this->databaseHelper->addVerificationCode($verificationCode, $user_id, $verificationCodeExpires);
-
-            $user_info = get_userdata($user->ID);
-            $email = $user_info->user_email;
-
-            //TODO: export top code in separate function (also in user_register_hook)
-
             return $this->userManager->logout_and_redirect($redirect, array(
-                ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail. <a id="user-registration-for-woocommerce-resend-verification-mail"> Erneut senden</a>', 
+                ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail. <a data-id="'. $user->ID .'" id="user-registration-for-woocommerce-resend-verification-mail"> Erneut senden</a>', 
                 'type' => 'error']
             ));
         } 
@@ -134,8 +108,6 @@ class UserRegistrationForWoocommerceCore {
                 ['notice' =>'Registration code missing!', 
                 'type' => 'error']
             ));
-
-            update_option('urfw-redirect', 1);
 
             wp_redirect($redirect);
 
