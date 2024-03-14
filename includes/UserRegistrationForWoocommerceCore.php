@@ -101,8 +101,18 @@ class UserRegistrationForWoocommerceCore {
             if($userStatus[0]->verification_status != Status::PENDING) return $redirect; //status not pending
                
             //block user from logging in
+            $verificationCode = $this->verificationCodeManager->generateCode();
+            $verificationCodeExpires = $this->verificationCodeManager->getCodeExpiration();
+            
+            $verificationCodeResult = $this->databaseHelper->addVerificationCode($verificationCode, $user_id, $verificationCodeExpires);
+
+            $user_info = get_userdata($user->ID);
+            $email = $user_info->user_email;
+
+            //TODO: export top code in separate function (also in user_register_hook)
+
             return $this->userManager->logout_and_redirect($redirect, array(
-                ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail.', 
+                ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail. <a id="user-registration-for-woocommerce-resend-verification-mail"> Erneut senden</a>', 
                 'type' => 'error']
             ));
         } 

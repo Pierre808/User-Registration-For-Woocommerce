@@ -18,6 +18,9 @@ class UserRegistrationForWoocommerceHooksManager {
         add_action('admin_enqueue_scripts', array($this, 'user_registration_for_woocommerce_enqueue_custom_styles_and_scripts'));
         add_action('admin_enqueue_scripts', array($this, 'user_registration_for_woocommerce_enqueue_jquery'));
 
+        //wp footer hook
+        add_action('wp_footer', array($this, 'user_registration_for_woocommerce_enqueue_footer_script'));
+
         //created customer hook
         add_action('woocommerce_created_customer', array($this->userRegistrationForWoocommerceCore, 'user_registration_for_woocommerce_user_register_hook'), 10, 1);
 
@@ -77,10 +80,18 @@ class UserRegistrationForWoocommerceHooksManager {
     /**
      * Custom script and styles callback
      */
-    public function user_registration_for_woocommerce_enqueue_custom_styles_and_scripts() {
-        //add custom script and styles here
+    public function user_registration_for_woocommerce_enqueue_custom_styles_and_scripts() { 
+        //enqueue scripts and styles here
     }
 
+    /**
+     * Callback for footer -> footerscript
+     */
+    public function user_registration_for_woocommerce_enqueue_footer_script() {
+        if(is_account_page()) {
+            wp_enqueue_script('user_registration_for_woocommerce_verificationmail_script',  plugin_dir_url(__FILE__) . '../assets/js/verificationmail-script.js');
+        }
+    }
 
     /**
      * Save to option ajax hook callback
