@@ -184,7 +184,7 @@ class UserRegistrationForWoocommerceDatabaseHelper {
             $r = $this->wpdb->update(
                 $this->prefix.'user',
                 array(
-                    'verification_status' => $status
+                    'verification_status' => $verification_status
                 ),
                 array(
                     'ID' => $user_id
@@ -263,14 +263,11 @@ class UserRegistrationForWoocommerceDatabaseHelper {
 
         $code = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT code, user_id, created, expires FROM {$this->prefix}verification_code WHERE code = '{$verification_code}'", 
+                "SELECT code, user_id, created, expires FROM {$this->prefix}verification_code WHERE code = %s",
+                $verification_code 
             ),
             OBJECT
         );
-
-
-        update_option('urfw-gvc', $code);
-        //TODO: ERROR (returns string????)
 
         return $code;
     }

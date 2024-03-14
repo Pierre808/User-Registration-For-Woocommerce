@@ -121,7 +121,7 @@ class UserRegistrationForWoocommerceCore {
         if(!$data->get_params() || !array_key_exists('user_registration_code', $data->get_params()))
         {
             $redirect = $this->userManager->logout_and_redirect($redirect, array(
-                ['notice' =>'registration code missing!.', 
+                ['notice' =>'Registration code missing!', 
                 'type' => 'error']
             ));
 
@@ -137,7 +137,7 @@ class UserRegistrationForWoocommerceCore {
         $verificationCodeDb = $this->databaseHelper->getVerificationCode($verificationCode);
         if($verificationCodeDb == null) {
             $redirect = $this->userManager->logout_and_redirect($redirect, array(
-                ['notice' =>'invalid registration code!.', 
+                ['notice' =>'Invalid registration code!', 
                 'type' => 'error']
             ));
 
@@ -150,7 +150,7 @@ class UserRegistrationForWoocommerceCore {
         $currentDateTime =  date( 'Y-m-d H:i:s', strtotime( current_time('Y-m-d H:i:s') ) );
         if($verificationCodeExpires < $currentDateTime) {
             $redirect = $this->userManager->logout_and_redirect($redirect, array(
-                ['notice' =>'registration code expired!.', 
+                ['notice' =>'Registration code expired!', 
                 'type' => 'error']
             ));
 
@@ -162,7 +162,7 @@ class UserRegistrationForWoocommerceCore {
         $user = $this->databaseHelper->getUser($verificationCodeDb->user_id);
         if($user == null) {
             $redirect = $this->userManager->logout_and_redirect($redirect, array(
-                ['notice' =>'invalid user!.', 
+                ['notice' =>'Invalid user!', 
                 'type' => 'error']
             ));
             

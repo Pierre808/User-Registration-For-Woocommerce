@@ -35,7 +35,7 @@ class UserRegistrationForWoocommerceVerificationCodeManager {
             // Get current datetime
             $wp_current_datetime = current_time('Y-m-d H:i:s');
             $wp_current_datetime = date( 'Y-m-d H:i:s', strtotime( $wp_current_datetime ) + $this->defaultExpirationTime ); 
-            
+
             $expires = $wp_current_datetime;
         }
 
