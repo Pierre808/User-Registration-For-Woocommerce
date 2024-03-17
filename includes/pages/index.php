@@ -1,10 +1,23 @@
 <?php
 
+require_once plugin_dir_path(__FILE__) . "../Placeholders.php";
+
 ob_start();
 ?>
 
 <h2> Settings </h2>
 <hr>
+
+<h3>Placeholders:</h3>
+<?php
+$placeholders = new Placeholders();
+foreach($placeholders->getPlaceholders() as $placeholder) {
+    echo "<p>[{$placeholder['val']}]: {$placeholder['description']}</p>";
+}
+?>
+
+<br>
+<h3>Settings:</h3>
 <p>Verification Mail content:</p>
 <?php 
     $content = get_option('user_registration_for_woocommerce_verification_mail_content_value');
@@ -12,7 +25,7 @@ ob_start();
     $settings = array( 
         'textarea_name' => 'user_registration_for_woocommerce_verification_mail_content',
         'textarea_rows'=>8,
-        'media_buttons' => false
+        'media_buttons' => true
     );
     wp_editor(stripslashes($content), $editor_id, $settings);
 ?>

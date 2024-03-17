@@ -73,6 +73,8 @@ class UserRegistrationForWoocommerceMailManager{
             $verificationLinkUrl
         );
 
+        $messageContent = $this->stripslashes($messageContent);
+
         $message = '
         <html>
         <head>
@@ -122,4 +124,24 @@ class UserRegistrationForWoocommerceMailManager{
     public function set_html_content_type() {
         return 'text/html';
     }
+
+    /**
+    * Stripslashed helper
+    * @param string $str
+    * @return string cleaned string
+    */
+    private function stripslashes($str) {
+       return preg_replace_callback('/\\\\(.?)/', function ($matches) {
+           switch ($matches[1]) {
+               case '\\':
+                   return '\\';
+               case '0':
+                   return '\u0000';
+               case '':
+                   return '';
+               default:
+                   return $matches[1];
+           }
+       }, $str);
+   }
 }
