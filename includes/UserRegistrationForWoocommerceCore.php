@@ -36,11 +36,62 @@ class UserRegistrationForWoocommerceCore {
 
 
     /**
+     * Add fields to the woocommerce registration
+     */
+    public function user_registration_for_woocommerce_extra_register_fields() {
+        ?>
+            <p class="form-row form-row-first">
+                <label for="reg_billing_first_name"><?php _e( 'First name', 'woocommerce' ); ?><span class="required">*</span></label>
+                <input type="text" class="input-text" name="billing_first_name" id="reg_billing_first_name" value="<?php if ( ! empty( $_POST['billing_first_name'] ) ) esc_attr_e( $_POST['billing_first_name'] ); ?>" />
+            </p>
+
+            <p class="form-row form-row-last">
+                <label for="reg_billing_last_name"><?php _e( 'Last name', 'woocommerce' ); ?><span class="required">*</span></label>
+                <input type="text" class="input-text" name="billing_last_name" id="reg_billing_last_name" value="<?php if ( ! empty( $_POST['billing_last_name'] ) ) esc_attr_e( $_POST['billing_last_name'] ); ?>" />
+            </p>
+
+            <div class="clear"></div>
+        <?php
+    }
+
+    /**
+     * Validate the fields added to the woocommerce registration
+     */
+    function user_registration_for_woocommerce_validate_extra_register_fields($username, $email, $validation_errors) {
+        if ( isset( $_POST['billing_first_name'] ) && empty( $_POST['billing_first_name'] ) ) {
+               $validation_errors->add( 'billing_first_name_error', __( '<strong>Error</strong>: Bitte geben Sie Ihren Vornamen an!', 'woocommerce' ) );
+        }
+        if ( isset( $_POST['billing_last_name'] ) && empty( $_POST['billing_last_name'] ) ) {
+               $validation_errors->add( 'billing_last_name_error', __( '<strong>Error</strong>: Bitte geben Sie Ihren Nachnamen an!.', 'woocommerce' ) );
+        }
+           
+        return $validation_errors;
+    }
+
+    /**
      * Woocommerce_created_customer action. before: user register
      */
-    public function user_registration_for_woocommerce_user_register_hook($user_id) {
+    public function user_registration_for_woocommerce_created_customer_hook($user_id) {
+        //add user to database
         $this->userManager->addUser($user_id);
 
+
+        //save additional registration fields
+        if ( isset( $_POST['billing_first_name'] ) ) {
+                //First name field which is by default
+                update_user_meta( $user_id, 'first_name', sanitize_text_field( $_POST['billing_first_name'] ) );
+                // First name field which is used in WooCommerce
+                update_user_meta( $user_id, 'billing_first_name', sanitize_text_field( $_POST['billing_first_name'] ) );
+        }
+        if ( isset( $_POST['billing_last_name'] ) ) {
+                // Last name field which is by default
+                update_user_meta( $user_id, 'last_name', sanitize_text_field( $_POST['billing_last_name'] ) );
+                // Last name field which is used in WooCommerce
+                update_user_meta( $user_id, 'billing_last_name', sanitize_text_field( $_POST['billing_last_name'] ) );
+        }
+
+
+        //send mail
         $mailSendingResult = $this->mailManager->sendStandardVerificationEmail($user_id);
     
         //mail error handling
@@ -75,7 +126,7 @@ class UserRegistrationForWoocommerceCore {
     /**
      * Add notice after user login redirect
      */
-    public function user_registration_for_woocommerce_custom_login($redirect, $user = '') {
+    public function user_registration_for_woocommerce_custom_login_redirect($redirect, $user = '') {
         if( isset($user) && is_a( $user, 'WP_User' ) && $user->ID > 0 ) {
             $userStatus = $this->databaseHelper->getUserStatus($user->ID);
 
