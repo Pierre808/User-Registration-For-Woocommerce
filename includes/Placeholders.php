@@ -7,7 +7,7 @@ class Placeholders {
         $this->placeholders = [
             'VERIFICATIONLINK' => [
                 'val' => 'verificationlink',
-                'description' => 'The inidividual verificationlink'
+                'description' => 'The inidividual verification-link'
             ]
         ];
     }
