@@ -42,6 +42,12 @@ class UserRegistrationForWoocommerceUserManager {
     public function logout_and_redirect($redirect, $notices) {
         $this->logout();
         
+
+        if (!isset(WC()->session)) {
+            WC()->session = new WC_Session_Handler();
+            WC()->session->init();
+        }
+
         // Only create when there is none, e.g may clear the existing cart item
         if ( ! WC()->session->has_session() ) {
             WC()->session->set_customer_session_cookie(true);

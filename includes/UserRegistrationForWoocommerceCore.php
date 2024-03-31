@@ -183,7 +183,7 @@ class UserRegistrationForWoocommerceCore {
         $currentDateTime =  date( 'Y-m-d H:i:s', strtotime( current_time('Y-m-d H:i:s') ) );
         if($verificationCodeExpires < $currentDateTime) {
             $redirect = $this->userManager->logout_and_redirect($redirect, array(
-                ['notice' =>'Registration code expired!', 
+                ['notice' =>'Verifizierungs-code abgelaufen.', 
                 'type' => 'error']
             ));
 
@@ -204,7 +204,20 @@ class UserRegistrationForWoocommerceCore {
             exit();
         }
 
+
         require_once plugin_dir_path(__FILE__) . "Statuses.php";
+
+        if($user->verification_status == Status::APPROVED) {
+            $redirect = $this->userManager->logout_and_redirect($redirect, array(
+                ['notice' =>'Dein Konto ist schon verifiziert.', 
+                'type' => 'error']
+            ));
+            
+            wp_redirect($redirect);
+
+            exit();
+        }
+
         $this->databaseHelper->setUserStatus($user->ID, Status::APPROVED);
 
         $redirect = $this->userManager->logout_and_redirect($redirect, array(
