@@ -52,7 +52,7 @@ class UserRegistrationForWoocommerceMailManager{
             $verificationCodeResult = $this->core->databaseHelper->addVerificationCode($verificationCode, $user_id, $verificationCodeExpires);
         }
 
-        $subject = 'Bitte verifizieren Sie Ihre E-Mail-Adresse';
+        $subject = 'Verifiziere Deine E-Mail-Adresse';
         //$message = 'Please click on the following link to verify your email address: [Verification Link]';
         
         $verificationLinkUrl = home_url() . "/wp-json/user-registration/v1/verification-link";

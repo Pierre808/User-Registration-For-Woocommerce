@@ -59,10 +59,10 @@ class UserRegistrationForWoocommerceCore {
      */
     function user_registration_for_woocommerce_validate_extra_register_fields($username, $email, $validation_errors) {
         if ( isset( $_POST['billing_first_name'] ) && empty( $_POST['billing_first_name'] ) ) {
-               $validation_errors->add( 'billing_first_name_error', __( '<strong>Error</strong>: Bitte geben Sie Ihren Vornamen an!', 'woocommerce' ) );
+               $validation_errors->add( 'billing_first_name_error', __( 'Bitte gib Deinen Vornamen an!', 'woocommerce' ) );
         }
         if ( isset( $_POST['billing_last_name'] ) && empty( $_POST['billing_last_name'] ) ) {
-               $validation_errors->add( 'billing_last_name_error', __( '<strong>Error</strong>: Bitte geben Sie Ihren Nachnamen an!.', 'woocommerce' ) );
+               $validation_errors->add( 'billing_last_name_error', __( 'Bitte gib Deinen Nachnamen an!.', 'woocommerce' ) );
         }
            
         return $validation_errors;
@@ -115,7 +115,7 @@ class UserRegistrationForWoocommerceCore {
         $user = wp_get_current_user();
         if( isset($user) && is_a( $user, 'WP_User' ) && $user->ID > 0 ) {
             return $this->userManager->logout_and_redirect($redirect_to, array(
-                ['notice' =>'Vielen Dank für Ihre Registrierung. Ihr Konto muss aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen Sie Ihre E-Mail.', 
+                ['notice' =>'Vielen Dank für Deine Registrierung. Dein Konto muss aktiviert werden, bevor Du dich anmelden kannst. Bitte überprüfe Deine E-Mail.', 
                 'type' => 'notice']
             ));
         } 
@@ -137,7 +137,7 @@ class UserRegistrationForWoocommerceCore {
                
             //block user from logging in
             return $this->userManager->logout_and_redirect($redirect, array(
-                ['notice' =>'Ihr Konto muss noch aktiviert werden, bevor Sie sich anmelden können. Bitte überprüfen sie Ihre E-Mail. <a data-id="'. $user->ID .'" id="user-registration-for-woocommerce-resend-verification-mail"> Erneut senden</a>', 
+                ['notice' =>'Dein Konto muss noch aktiviert werden, bevor Du dich anmelden kannst. Bitte überprüfe Deine E-Mail. <a data-id="'. $user->ID .'" id="user-registration-for-woocommerce-resend-verification-mail"> Erneut senden</a>', 
                 'type' => 'error']
             ));
         } 
@@ -208,7 +208,7 @@ class UserRegistrationForWoocommerceCore {
         $this->databaseHelper->setUserStatus($user->ID, Status::APPROVED);
 
         $redirect = $this->userManager->logout_and_redirect($redirect, array(
-            ['notice' =>'Erfolgreich verifiziert. Sie können Sich nun anmelden.', 
+            ['notice' =>'Erfolgreich verifiziert. Du kannst dich nun anmelden.', 
             'type' => 'notice']
         ));
         
