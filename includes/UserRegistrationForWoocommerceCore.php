@@ -59,10 +59,10 @@ class UserRegistrationForWoocommerceCore {
      */
     function user_registration_for_woocommerce_validate_extra_register_fields($username, $email, $validation_errors) {
         if ( isset( $_POST['billing_first_name'] ) && empty( $_POST['billing_first_name'] ) ) {
-               $validation_errors->add( 'billing_first_name_error', __( 'Bitte gib Deinen Vornamen an!', 'woocommerce' ) );
+               $validation_errors->add( 'billing_first_name_error', __( 'Bitte gib Deinen Vornamen an.', 'woocommerce' ) );
         }
         if ( isset( $_POST['billing_last_name'] ) && empty( $_POST['billing_last_name'] ) ) {
-               $validation_errors->add( 'billing_last_name_error', __( 'Bitte gib Deinen Nachnamen an!.', 'woocommerce' ) );
+               $validation_errors->add( 'billing_last_name_error', __( 'Bitte gib Deinen Nachnamen an.', 'woocommerce' ) );
         }
            
         return $validation_errors;
